@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("STUDIO_ROLES")]
+    [Table("YS_STUDIO_ROLES")]
     public class StudioRole
     {
         [Key]
@@ -14,6 +14,7 @@ namespace YogaStudioLRAManagementSystem.Models
 
         [Column("ROLE_NAME")]
         [Required (ErrorMessage = "Role name is required.")]
+        [StringLength (15)]
         public string RoleName { get; set; } = null!;
 
         [Column("REQUIRES_CERT")] 

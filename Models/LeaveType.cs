@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("LEAVE_TYPES")]
+    [Table("YS_LEAVE_TYPES")]
     public class LeaveType
     {
         [Key]
@@ -19,6 +19,8 @@ namespace YogaStudioLRAManagementSystem.Models
         [Column("IS_PAID")]
         public bool IsPaid { get; set; } //true -> is paid, false -> not paid
 
+        [Column("AFFECTS_BALANCE")]
+        public bool AffectsBalance { get; set; } //to keep track if to check/deduct leave balance of an employee
         [Column("MIN_DAYS")]
         public int MinDays { get; set; } = 1;
 

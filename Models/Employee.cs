@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("EMPLOYEES")]
+    [Table("YS_EMPLOYEES")]
     public class Employee
     {
         [Key]
@@ -22,15 +22,22 @@ namespace YogaStudioLRAManagementSystem.Models
         public string LastName { get; set; }
 
         [Column("HIRE_DATE")]
-        [Required(ErrorMessage = "Hire date is required.")]        
-        public DateOnly HireDate { get; set; }
+        [Required(ErrorMessage = "Hire date is required.")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime HireDate { get; set; }
 
         [Column("CERTIFICATION")]
+        [StringLength(150)]
         public string? Certification { get; set; }
 
-        [Column("LEAVE_BALANCE")]
+        [Column("VACATION_BALANCE")]
         [Required(ErrorMessage ="Leave balance is required.")]        
-        public int LeaveBalance { get; set; } // in days
+        public int VacationBalance { get; set; } // in days
+
+        [Column("SICK_LEAVE_BALANCE")]
+        [Required(ErrorMessage = "Leave balance is required.")]
+        public int SickLeaveBalance { get; set; } // in days
 
         // Foreign key to StudioRole
         [Column("STUDIO_ROLE_ID")]

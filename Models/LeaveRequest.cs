@@ -4,7 +4,7 @@ using YogaStudioLRAManagementSystem.Constants;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("LEAVE_REQUESTS")]
+    [Table("YS_LEAVE_REQUESTS")]
     public class LeaveRequest 
 
     {
@@ -16,14 +16,14 @@ namespace YogaStudioLRAManagementSystem.Models
         [Column("START_DATE")]
         [Required(ErrorMessage ="Start date is required.")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")] //display as 2026-03-28
-        public DateOnly StartDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] //display as 2026-03-28
+        public DateTime StartDate { get; set; }
 
         [Column("END_DATE")]
         [Required(ErrorMessage ="End date is required.")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")] //display as 2026-03-28
-        public DateOnly EndDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] //display as 2026-03-28
+        public DateTime EndDate { get; set; }
 
         [Column("REQUEST_STATUS")]
         [Required] //no error message needed - system generated

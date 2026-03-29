@@ -4,7 +4,7 @@ using YogaStudioLRAManagementSystem.Constants;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("USERS")]
+    [Table("YS_USERS")]
     public class User
     {
         [Key]
@@ -26,6 +26,7 @@ namespace YogaStudioLRAManagementSystem.Models
         [Column("EMAIL_ID")]
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage ="Please provide a valid email format.")]
+        [StringLength(100)]
         public string EmailAddress { get; set; }
 
         [Column("PROFILE_ROLE")]

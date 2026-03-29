@@ -4,7 +4,7 @@ using YogaStudioLRAManagementSystem.Constants;
 
 namespace YogaStudioLRAManagementSystem.Models
 {
-    [Table("ATTENDANCES")]
+    [Table("YS_ATTENDANCES")]
     public class Attendance
     {
         [Key]
@@ -22,20 +22,20 @@ namespace YogaStudioLRAManagementSystem.Models
         [Required]
         [Column("DATE")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")] //display as 2026-03-28
-        public DateOnly Date {  get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] //display as 2026-03-28
+        public DateTime Date {  get; set; }
 
         [Column("CLOCK_IN")]
         [DataType(DataType.Time)]
-        [DisplayFormat(DataFormatString = "{0:hh\\:mm tt}")] //display as 09:30 AM, 02:15 PM
+        [DisplayFormat(DataFormatString = "{0:hh:mm tt}")] //display as 09:30 AM, 02:15 PM
         [Display(Name ="Clock In")]
-        public TimeOnly? ClockIn { get; set; } //nullable - not clocked in yet
+        public DateTime? ClockIn { get; set; } //nullable - not clocked in yet
 
         [Column("CLOCK_OUT")]
         [DataType(DataType.Time)]
-        [DisplayFormat(DataFormatString = "{0:hh\\:mm tt}")] //display as 09:30 AM, 02:15 PM
+        [DisplayFormat(DataFormatString = "{0:hh:mm tt}")] //display as 09:30 AM, 02:15 PM
         [Display(Name = "Clock Out")]
-        public TimeOnly? ClockOut { get; set; } //nullable - not clocked out yet
+        public DateTime? ClockOut { get; set; } //nullable - not clocked out yet
 
         [Column("TOTAL_HOURS")]
         [Display(Name ="Total Hours")]
