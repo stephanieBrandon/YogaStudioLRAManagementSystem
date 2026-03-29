@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using YogaStudioLRAManagementSystem.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+//oracle service
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
 
 var app = builder.Build();
 
