@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using YogaStudioLRAManagementSystem.Constants;
 using YogaStudioLRAManagementSystem.Models;
 
 namespace YogaStudioLRAManagementSystem.Data
@@ -26,14 +28,35 @@ namespace YogaStudioLRAManagementSystem.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // =============================================
-            // SEED DATA — Static tables only
-            // StudioRoles and LeaveTypes are seeded once
-            // and are not editable by users
-            // =============================================
+            // Seed Admin Employee
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    EmployeeId = 999,
+                    FirstName = "Studio",
+                    LastName = "Owner",
+                    HireDate = new DateTime(2024, 1, 1),
+                    VacationBalance = 0,
+                    SickLeaveBalance = 0,
+                    StudioRoleId = 1 // Instructor
+                }
+            );
 
-            // --- StudioRoles Seed Data ---
-            // Instructor requires certification, others do not
+            // Seed Admin User
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    UserId = 999,
+                    UserName = "admin",
+                    EmailAddress = "admin@yogastudio.com",
+                    Password = new PasswordHasher<User>().HashPassword(null!, "Admin123"),
+                    Role = UserRoles.ADMIN,
+                    EmployeeId = 999,
+                    MustChangePassword = false
+                }
+            );
+
+            // StudioRoles Seed Data - Static tables only - seeded once and are not editable by users
             modelBuilder.Entity<StudioRole>().HasData(
                 new StudioRole
                 {
@@ -55,7 +78,7 @@ namespace YogaStudioLRAManagementSystem.Data
                 }
             );
 
-            // --- LeaveTypes Seed Data ---
+            // LeaveTypes Seed Data — Static tables only - seeded once and are not editable by users
             // AffectsBalance = true  → deducts from VacationBalance or SickLeaveBalance on approval
             // AffectsBalance = false → tracked in LeaveRequests history but no balance deduction
             // IsPaid = true          → paid leave
