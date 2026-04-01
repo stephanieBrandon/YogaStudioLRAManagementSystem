@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using YogaStudioLRAManagementSystem.Data;
 
@@ -8,6 +9,16 @@ builder.Services.AddControllersWithViews();
 //oracle service
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
+
+//Add authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login"; //redired to this path if not authenticated
+        options.AccessDeniedPath = "/Auth/AccessDenied";//redirect to this path if access is denied
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); //Set cookies expiration time
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -24,6 +35,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

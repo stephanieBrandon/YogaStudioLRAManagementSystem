@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using YogaStudioLRAManagementSystem.Constants;
 
@@ -23,6 +24,9 @@ namespace YogaStudioLRAManagementSystem.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        [Column("MUST_CHANGE_PASSWORD")] 
+        public bool MustChangePassword { get; set; } = true; //Admin sets inital password, flag to keep track if first sign in - must change password
+
         [Column("EMAIL_ID")]
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage ="Please provide a valid email format.")]
@@ -41,5 +45,29 @@ namespace YogaStudioLRAManagementSystem.Models
 
         [ForeignKey("EmployeeId")]
         public Employee Employee { get; set; } = null!; //null-forgiving operator - right now this is empty but it will not be empty when it matters
+
+        /// <summary>
+        /// Hashes password enterd by the user on registration
+        /// and set it to PasswordHash - then hashed password
+        /// is saved to DB table
+        /// </summary>
+        /// <param name="password">user enter password to be hashed</param>
+        public void SetPassword(string password)
+        {
+            var hasher = new PasswordHasher<User>();
+            Password = hasher.HashPassword(this, password);
+        }
+
+        /// <summary>
+        /// Verify entered password against stored hash on login
+        /// </summary>
+        /// <param name="password">User entered password on sign in</param>
+        /// <returns>True for match and False if unmatched</returns>
+        public bool VerifyPassword(string password)
+        {
+            var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(this, Password, password);
+            return result == PasswordVerificationResult.Success;
+        }
     }
 }
