@@ -1,0 +1,49 @@
+﻿@model YogaStudioLRAManagementSystem.Models.LeaveRequest
+
+@{
+    ViewData["Title"] = "Approve/Deny";
+}
+
+<h1>Approve / Deny</h1>
+
+<h4>LeaveRequest</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" >
+            <div class="form-group">
+                <input type="hidden" asp-for="EmployeeId" class="form-control" value="ViewBag.EmployeeId" />
+            </div>
+                <input type="hidden" asp-for="LeaveTypeId" class="form-control" value="ViewBag.LeaveTypeId" />
+            <div class="form-group">
+                <input readonly asp-for="RequestId" value="RequestId" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <input readonly asp-for="StartDate" value="StartDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input readonly asp-for="StartDate" value="StartDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input asp-for="Status" class="form-control" readonly value="Status"/>
+            </div>
+            <div class="form-group">
+                <input asp-for="Reason" class="form-control" readonly value="Reason"/>
+            </div>            
+            <div class="form-group">
+                <input type="submit" value="Approve" class="btn btn-primary" />
+                <input type="submit" value="Deny" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
