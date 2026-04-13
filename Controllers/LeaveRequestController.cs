@@ -6,6 +6,7 @@ using System.Security.Claims;
 using YogaStudioLRAManagementSystem.Data;
 using YogaStudioLRAManagementSystem.Models;
 using YogaStudioLRAManagementSystem.Constants;
+using YogaStudioLRAManagementSystem.ViewModels;
 
 namespace YogaStudioLRAManagementSystem.Controllers
 {
@@ -23,11 +24,12 @@ namespace YogaStudioLRAManagementSystem.Controllers
         [HttpGet]
         //View all leave requests in a 'manager approval view' - only managers and admin have access:
         [Authorize(Roles = "Admin, Manager")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(LeaveRequestViewModel model)
         {
             var requests = await _context.LeaveRequests
                 .Include(l => l.Employee)
                 .Include(l => l.LeaveType)
+                
                 .ToListAsync();
             
             return View(requests);
@@ -51,7 +53,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
             {
                 return NotFound();
             }
-
+           
             return View(leaveRequest);
         }
         //---------------------------------------------BOTH----------------------------------------------------------------        
@@ -80,11 +82,8 @@ namespace YogaStudioLRAManagementSystem.Controllers
         }
 
 
-        //-------------------------------------MANAGER + ADMIN---------------------------------------------------------------
-
         [HttpGet]
-        //We are only editing PENDING requests -- Managers and Admin have access
-        [Authorize(Roles = "Admin, Manager")]
+        //We are only editing PENDING requests
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

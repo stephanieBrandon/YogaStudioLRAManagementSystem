@@ -1,0 +1,121 @@
+﻿@model IEnumerable<YogaStudioLRAManagementSystem.ViewModels.LeaveRequestViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<!--First we have the view for everyone, so you see only your requests:-->
+<p>
+    <a asp-action="Create">Submit new Leave Request?</a>
+</p>
+<h2> 
+    Your Requests
+</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MyRequests.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MyRequests.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MyRequests.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MyRequests.Reason)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MyRequests.LeaveType)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.MyRequests)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reason)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LeaveType.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.RequestId">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.RequestId">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!--Now this part of the view is only accessible by managers/admin:-->
+<!--I think I need to import the user somehow?-->
+@if (User.IsInRole(UserRoles.Manager) || User.IsInRole(UserRoles.Admin))
+{
+    <h2> 
+        Team Requests
+    </h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeamRequests.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeamRequests.EndDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeamRequests.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeamRequests.Reason)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeamRequests.LeaveType)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.TeamRequests)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Reason)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaveType.Name)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.RequestId">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.RequestId">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
