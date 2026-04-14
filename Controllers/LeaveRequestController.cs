@@ -66,10 +66,13 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RequestId,StartDate,EndDate,Status,Reason,EmployeeId,LeaveTypeId")] LeaveRequest leaveRequest)
+        public async Task<IActionResult> Create([Bind("RequestId,StartDate,EndDate,Reason,EmployeeId,LeaveTypeId")] LeaveRequest leaveRequest)
         {
             if (ModelState.IsValid)
             {
+
+                leaveRequest.Status = LeaveRequestStatus.PENDING;
+
                 _context.Add(leaveRequest);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -84,7 +87,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
         [HttpGet]
         //We are only editing PENDING requests -- Managers and Admin have access
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")] //change this so it includes logic for both staff and admin/manager
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
