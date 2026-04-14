@@ -28,9 +28,9 @@
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            @* <li class="nav-item">
+                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Index">Employees</a>
-                            </li> *@
+                            </li> 
 
                             @if (User.IsInRole("Admin"))
                             {
