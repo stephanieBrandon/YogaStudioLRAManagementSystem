@@ -20,24 +20,73 @@ namespace YogaStudioLRAManagementSystem.Controllers
             _context = context;
         }
 
-        //-------------------------------------MANAGER + ADMIN---------------------------------------------------------------
         [HttpGet]
-        //View all leave requests in a 'manager approval view' - only managers and admin have access:
-        [Authorize(Roles = "Admin, Manager")]
-        public async Task<IActionResult> Index(LeaveRequestViewModel model)
+        [HttpGet]
+        public async Task<IActionResult> Index(string? statusFilter, int? employeeIdFilter)
         {
-            var requests = await _context.LeaveRequests
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var role = user.Role;
+            var employeeId = user.EmployeeId;
+
+            var myRequests = await _context.LeaveRequests
                 .Include(l => l.Employee)
                 .Include(l => l.LeaveType)
-                
+                .Where(l => l.EmployeeId == employeeId)
+                .OrderByDescending(l => l.StartDate)
                 .ToListAsync();
-            
-            return View(requests);
+
+           
+            var teamRequests = role == UserRoles.MANAGER
+                ? await _context.LeaveRequests
+                    .Include(l => l.Employee)
+                    .Include(l => l.LeaveType)
+                    .Where(l => l.EmployeeId != employeeId)
+                    .OrderByDescending(l => l.StartDate)
+                    .ToListAsync()
+                : new List<LeaveRequest>();
+
+            //since admin should be able to see all the requests plus filter thru them, we create a separate query:
+            var adminQuery = _context.LeaveRequests
+                .Include(l => l.Employee)
+                .Include(l => l.LeaveType)
+                .AsQueryable();
+
+            if (role == UserRoles.ADMIN)
+            {
+                if (!string.IsNullOrEmpty(statusFilter))
+                {
+                    adminQuery = adminQuery.Where(l => l.Status == statusFilter);
+                }
+
+                if (employeeIdFilter.HasValue)
+                {
+                    adminQuery = adminQuery.Where(l => l.EmployeeId == employeeIdFilter.Value);
+                }
+            }
+
+            var allRequests = role == UserRoles.ADMIN
+                ? await adminQuery.OrderByDescending(l => l.StartDate).ToListAsync()
+                : new List<LeaveRequest>();
+
+            var model = new LeaveRequestViewModel
+            {
+                MyRequests = myRequests,
+                TeamRequests = teamRequests,
+                AllRequests = allRequests,
+                Role = role
+            };
+
+            return View(model);
         }
 
         [HttpGet]
-        //here we can view a specific leave request -- again only managers
-        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -48,7 +97,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
             var leaveRequest = await _context.LeaveRequests
                 .Include(l => l.Employee)
                 .Include(l => l.LeaveType)
-                .FirstOrDefaultAsync(m => m.RequestId == id);
+                .FirstOrDefaultAsync(l => l.RequestId == id);
             if (leaveRequest == null)
             {
                 return NotFound();
@@ -56,9 +105,10 @@ namespace YogaStudioLRAManagementSystem.Controllers
            
             return View(leaveRequest);
         }
-        //---------------------------------------------BOTH----------------------------------------------------------------        
+               
 
-        [HttpGet]
+        [HttpGet] 
+        [Authorize(Roles = "STAFF, ADMIN")] //admin shouldnt be able to submit requests
         public IActionResult Create()
         {
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FirstName");
@@ -68,115 +118,151 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RequestId,StartDate,EndDate,Reason,EmployeeId,LeaveTypeId")] LeaveRequest leaveRequest)
+        [Authorize(Roles = "STAFF, ADMIN")]
+        public async Task<IActionResult> Create(LeaveRequest leaveRequest)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-
-                leaveRequest.Status = LeaveRequestStatus.PENDING;
-
-                _context.Add(leaveRequest);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewData["LeaveTypeId"] = new SelectList(_context.LeaveTypes, "LeaveTypeId", "Name");
+                return View(leaveRequest);
             }
-            ViewBag["EmployeeId"] = leaveRequest.EmployeeId;
-            ViewBag["LeaveTypeId"] = leaveRequest.LeaveTypeId;
-            return View(leaveRequest);
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            leaveRequest.EmployeeId = user.EmployeeId;
+            leaveRequest.Status = LeaveRequestStatus.PENDING;
+
+            _context.Add(leaveRequest);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
 
         [HttpGet]
-        //We are only editing PENDING requests -- Managers and Admin have access
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return Unauthorized();
 
             var leaveRequest = await _context.LeaveRequests
-                .AsQueryable()
-                .Where(r => r.Status.ToString() == "PENDING") //request status has to be pending
-                .FirstOrDefaultAsync(r => r.RequestId == id); // querying based on the request id given
+                .Include(l => l.LeaveType)
+                .FirstOrDefaultAsync(l => l.RequestId == id);
 
             if (leaveRequest == null)
-            {
                 return NotFound();
+
+            //Ownership check:
+            if (leaveRequest.EmployeeId != user.EmployeeId)
+                return Forbid();
+
+            //Only pending edit-able:
+            if (leaveRequest.Status != LeaveRequestStatus.PENDING)
+            {
+                return RedirectToAction("Details", new { id = leaveRequest.RequestId });
             }
-            ViewBag["EmployeeId"] = leaveRequest.EmployeeId;
-            ViewBag["LeaveTypeId"] = leaveRequest.LeaveTypeId; //needed for the form
 
             return View(leaveRequest);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //this action should be allowed by only managers and admin
-        [Authorize(Roles = "Admin, Manager")]
-        public async Task<IActionResult> Edit(int id, [Bind("RequestId,StartDate,EndDate,Status,Reason,EmployeeId,LeaveTypeId")] LeaveRequest leaveRequest)
+        [Authorize(Roles = "STAFF, ADMIN")]
+        public async Task<IActionResult> Edit(int id, LeaveRequest formRequest)
         {
-            if (id != leaveRequest.RequestId)
-            {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var existingRequest = await _context.LeaveRequests
+                .FirstOrDefaultAsync(l => l.RequestId == id);
+
+            if (existingRequest == null)
                 return NotFound();
+
+            //Ownership check:
+            if (existingRequest.EmployeeId != user.EmployeeId)
+                return Forbid();
+
+            //Only pending requests should be edit-able:
+            if (existingRequest.Status != LeaveRequestStatus.PENDING)
+            {
+                return RedirectToAction("Details", new { id = existingRequest.RequestId });
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(leaveRequest);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LeaveRequestExists(leaveRequest.RequestId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["EmployeeId"] = leaveRequest.EmployeeId;
-            ViewData["LeaveTypeId"] = leaveRequest.LeaveTypeId;
-            return View(leaveRequest);
+            existingRequest.StartDate = formRequest.StartDate;
+            existingRequest.EndDate = formRequest.EndDate;
+            existingRequest.Reason = formRequest.Reason;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "ADMIN, MANAGER")]
         [HttpGet]
         public async Task<IActionResult> Approve_Deny(int id)
         {
-            return RedirectToAction(nameof(Approve_Deny), id);
+            var request = await _context.LeaveRequests
+                .Include(r => r.Employee)
+                .Include(r => r.LeaveType)
+                .FirstOrDefaultAsync(r => r.RequestId == id);
+
+            if (request == null)
+                return NotFound();
+
+            return View(request);
         }
 
 
-        //allow managers to approve requests:
-        [Authorize(Roles = "Admin, Manager")]
+        //allow managers/admin to approve requests:
+        [Authorize(Roles = "ADMIN, MANAGER")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int requestId)
         {
             var request = await _context.LeaveRequests
-                .Include(r => r.RequestId)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId);
 
             if (request == null)
             {
-                return NotFound();
+                TempData["Error"] = "Request not found.";
+                return RedirectToAction(nameof(Index));
             }
-            request.Status = LeaveRequestStatus.APPROVED; //using the 'approved' constant to have less 'harcoded' code
 
-            _context.Update(request);
+            if (request.Status != LeaveRequestStatus.PENDING)
+            {
+                TempData["Error"] = "Only pending requests can be approved.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            request.Status = LeaveRequestStatus.APPROVED;
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Leave request approved!";
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "ADMIN, EMPLOYEE")]
+        [Authorize(Roles = "ADMIN, MANAGER")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Deny(int requestId)
@@ -186,16 +272,22 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
             if (request == null)
             {
-                return NotFound();
+                TempData["Error"] = "Request not found.";
+                return RedirectToAction(nameof(Index));
             }
-            request.Status = LeaveRequestStatus.DENIED; //again using status constant
+
+            if (request.Status != LeaveRequestStatus.PENDING)
+            {
+                TempData["Error"] = "Only pending requests can be denied.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            request.Status = LeaveRequestStatus.DENIED;
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Leave request rejected.";
             return RedirectToAction(nameof(Index));
         }
-
-        //-------------------------------------------------------------------------------------------------------------------
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -215,18 +307,31 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
             return View(leaveRequest);
         }
-        
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var leaveRequest = await _context.LeaveRequests.FindAsync(id);
-            if (leaveRequest != null)
-            {
-                _context.LeaveRequests.Remove(leaveRequest);
-            }
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var leaveRequest = await _context.LeaveRequests
+                .FirstOrDefaultAsync(l => l.RequestId == id);
+
+            if (leaveRequest == null)
+                return NotFound();
+
+            if (leaveRequest.EmployeeId != user.EmployeeId)
+                return Forbid();
+
+            _context.LeaveRequests.Remove(leaveRequest);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

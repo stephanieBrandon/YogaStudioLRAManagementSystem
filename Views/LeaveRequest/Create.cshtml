@@ -1,55 +1,76 @@
-﻿@model YogaStudioLRAManagementSystem.Models.LeaveRequest
+﻿@using YogaStudioLRAManagementSystem.Constants
+@model YogaStudioLRAManagementSystem.Models.LeaveRequest
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Leave Request";
 }
 
-<h1>Create</h1>
+<h1>Create Leave Request</h1>
 
-<h4>LeaveRequest</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div class="col-md-6">
+
+        <form asp-action="Create" method="post">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Employee (display only) -->
+            <div class="form-group">
+                <label>Employee</label>
+                <p class="form-control-plaintext">
+                    @User.Identity?.Name
+                </p>
+            </div>
+
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
+                <input asp-for="StartDate" class="form-control" type="date" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
+                <input asp-for="EndDate" class="form-control" type="date" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <label asp-for="Reason" class="control-label"></label>
-                <input asp-for="Reason" class="form-control" />
+                <textarea asp-for="Reason" class="form-control"></textarea>
                 <span asp-validation-for="Reason" class="text-danger"></span>
             </div>
-      
+
             <div class="form-group">
-                <input readonly asp-for="EmployeeId" class ="form-control" value="ViewBag.EmployeeId"/>
-            </div> 
-            <div class="form-group">
-                <input readonly asp-for="LeaveTypeId" class ="form-control" value="ViewBag.LeaveTypeId"/>
+                <label asp-for="LeaveTypeId" class="control-label"></label>
+                <select asp-for="LeaveTypeId"
+                        class="form-control"
+                        asp-items="ViewBag.LeaveTypeId">
+                </select>
+                <span asp-validation-for="LeaveTypeId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+
+            <!-- Status (NOT user controlled) -->
+            <input type="hidden" asp-for="Status" value="@LeaveRequestStatus.PENDING" />
+
+            <br />
+
+            <button type="submit" class="btn btn-primary">
+                Submit Request
+            </button>
+
         </form>
+
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List of Leave Requests</a>
+<div class="mt-3">
+    <a asp-action="Index">Back to Leave Requests</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -1,49 +1,76 @@
 ﻿@model YogaStudioLRAManagementSystem.Models.LeaveRequest
+@using YogaStudioLRAManagementSystem.Constants
 
 @{
     ViewData["Title"] = "Approve/Deny";
 }
 
-<h1>Approve / Deny</h1>
+<h1>Approve / Deny Leave Request</h1>
 
-<h4>LeaveRequest</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" >
-            <div class="form-group">
-                <input type="hidden" asp-for="EmployeeId" class="form-control" value="ViewBag.EmployeeId" />
-            </div>
-                <input type="hidden" asp-for="LeaveTypeId" class="form-control" value="ViewBag.LeaveTypeId" />
-            <div class="form-group">
-                <input readonly asp-for="RequestId" value="RequestId" class="form-control"/>
-            </div>
-            <div class="form-group">
-                <input readonly asp-for="StartDate" value="StartDate" class="form-control" />
-            </div>
-            <div class="form-group">
-                <input readonly asp-for="StartDate" value="StartDate" class="form-control" />
-            </div>
-            <div class="form-group">
-                <input asp-for="Status" class="form-control" readonly value="Status"/>
-            </div>
-            <div class="form-group">
-                <input asp-for="Reason" class="form-control" readonly value="Reason"/>
-            </div>            
-            <div class="form-group">
-                <input type="submit" value="Approve" class="btn btn-primary" />
-                <input type="submit" value="Deny" class="btn btn-primary" />
-            </div>
-        </form>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 }
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+<div>
+    <dl class="row">
+
+        <dt class="col-sm-2">Request ID</dt>
+        <dd class="col-sm-10">@Model.RequestId</dd>
+
+        <dt class="col-sm-2">Start Date</dt>
+        <dd class="col-sm-10">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-2">End Date</dt>
+        <dd class="col-sm-10">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Model.Status</dd>
+
+        <dt class="col-sm-2">Reason</dt>
+        <dd class="col-sm-10">@Model.Reason</dd>
+
+        <dt class="col-sm-2">Employee</dt>
+        <dd class="col-sm-10">@Model.Employee?.FirstName</dd>
+
+        <dt class="col-sm-2">Leave Type</dt>
+        <dd class="col-sm-10">@Model.LeaveType?.Name</dd>
+
+    </dl>
+</div>
+
+<hr />
+
+@if (Model.Status == LeaveRequestStatus.PENDING)
+{
+    <!-- Approve -->
+    <form asp-action="Approve" method="post" style="display:inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="requestId" value="@Model.RequestId" />
+        <button type="submit" class="btn btn-success">Approve</button>
+    </form>
+
+    <!-- Deny -->
+    <form asp-action="Deny" method="post" style="display:inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="requestId" value="@Model.RequestId" />
+        <button type="submit" class="btn btn-danger">Deny</button>
+    </form>
+}
+else
+{
+    <p><strong>This request has already been processed.</strong></p>
+}
+
+<hr />
+
+<a asp-action="Index">Back to List</a>

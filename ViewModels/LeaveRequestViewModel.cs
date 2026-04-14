@@ -5,37 +5,13 @@ using YogaStudioLRAManagementSystem.Models;
 
 namespace YogaStudioLRAManagementSystem.ViewModels
 {
-    public class LeaveRequestViewModel : Controller
+    public class LeaveRequestViewModel
     {
-        private readonly ApplicationDbContext _context;
+        public IEnumerable<LeaveRequest> MyRequests { get; set; } = new List<LeaveRequest>();
+        public IEnumerable<LeaveRequest> TeamRequests { get; set; } = new List<LeaveRequest>();
 
-        public LeaveRequestViewModel(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public IEnumerable<LeaveRequest> AllRequests { get; set; } = new List<LeaveRequest>();
 
-        public IEnumerable<LeaveRequest> MyRequests { get; set; }
-        public IEnumerable<LeaveRequest> TeamRequests { get; set; } 
-
-
-        public async Task<IActionResult> Index(User.UserId id) 
-            //this action should give us all requests belonging to the current users
-            //as well as all the 'team requests' which are everyone BUT the current manager's requests
-        {
-            //so this list should give us all the requests that belong to the currently logged in user:
-            MyRequests = await _context.LeaveRequests
-                .Include(l => l.EmployeeId == id)
-                .Include(l => l.Employee)
-                .Include(l => l.LeaveType)
-                .ToListAsync();
-
-            TeamRequests = await._context.LeaveRequests
-                .Include(l => l.EmployeeId != id)
-                .Include(l => l.Employee)
-                .Include(l => l.LeaveType)
-                .ToListAsync();
-
-            return View(MyRequests, TeamRequests);
-        }
+        public string Role { get; set; }
     }
 }
