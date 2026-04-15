@@ -12,6 +12,6 @@ namespace YogaStudioLRAManagementSystem.ViewModels
 
         public IEnumerable<LeaveRequest> AllRequests { get; set; } = new List<LeaveRequest>();
 
-        public string Role { get; set; }
+        //public string Role { get; set; }
     }
 }

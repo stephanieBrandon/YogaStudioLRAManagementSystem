@@ -75,7 +75,7 @@
             @foreach (var item in Model.TeamRequests)
             {
                 <tr>
-                    <td>@item.Employee.FirstName</td>
+                    <td>@item.Employee.FirstName, @item.Employee.LastName</td>
                     <td>@item.Employee.EmployeeId</td>
                     <td>@item.StartDate.ToString()</td>
                     <td>@item.EndDate.ToString()</td>
@@ -84,8 +84,8 @@
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
                            class="btn btn-sm btn-info">Details</a>
-                        <a asp-action="Approve_Deny" asp-route-requestId="@item.RequestId"
-                           class="btn btn-sm btn-info">Approve / Deny</a>
+                        <a asp-action="Review" asp-route-requestId="@item.RequestId"
+                           class="btn btn-sm btn-success">Review</a>
                     </td>
                 </tr>
             }
@@ -136,7 +136,9 @@
                     <td>@item.Reason</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
-                           class="btn btn-sm btn-info">Details</a>
+                           class="btn btn-sm btn-info">Details</a> |
+                        <a asp-action="Review" asp-route-requestId="@item.RequestId"
+                           class="btn btn-sm btn-success">Review</a>
                     </td>
                 </tr>
             }
