@@ -1,7 +1,7 @@
 ﻿@model YogaStudioLRAManagementSystem.ViewModels.LeaveRequestViewModel
 @using YogaStudioLRAManagementSystem.Constants
 
-<h1>Leave Requests</h1>
+<h2>Leave Requests</h2>
 
 <a asp-action="Create" class="btn btn-primary">Submit New Request</a>
 
@@ -22,25 +22,32 @@
 }
 
 
-<h2>My Requests</h2>
+<h3>My Requests</h3>
 
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Start</th>
             <th>End</th>
             <th>Status</th>
             <th>Reason</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.MyRequests)
         {
             <tr>
-                <td>@item.StartDate.ToShortDateString()</td>
-                <td>@item.EndDate.ToShortDateString()</td>
+                <td>@item.StartDate.ToString()</td>
+                <td>@item.EndDate.ToString()</td>
                 <td>@item.Status</td>
                 <td>@item.Reason</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                       class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-requestId="@item.RequestId" 
+                        class="btn btn-sm btn-info">Edit</a>
+                </td>
             </tr>
         }
     </tbody>
@@ -48,18 +55,20 @@
 
 <hr />
 
-@if (Model.Role == UserRoles.MANAGER)
+@if (User.IsInRole("Manager"))
 {
-    <h2>Team Requests</h2>
+    <h3>Team Requests</h3>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Employee</th>
+                <th>Employee ID</th>
                 <th>Start</th>
                 <th>End</th>
                 <th>Status</th>
                 <th>Reason</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -67,19 +76,26 @@
             {
                 <tr>
                     <td>@item.Employee.FirstName</td>
-                    <td>@item.StartDate.ToShortDateString()</td>
-                    <td>@item.EndDate.ToShortDateString()</td>
+                    <td>@item.Employee.EmployeeId</td>
+                    <td>@item.StartDate.ToString()</td>
+                    <td>@item.EndDate.ToString()</td>
                     <td>@item.Status</td>
                     <td>@item.Reason</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                           class="btn btn-sm btn-info">Details</a>
+                        <a asp-action="Approve_Deny" asp-route-requestId="@item.RequestId"
+                           class="btn btn-sm btn-info">Approve / Deny</a>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-@if (Model.Role == UserRoles.ADMIN)
+@if (User.IsInRole("Admin"))
 {
-    <h2>Admin - All Requests</h2>
+    <h3>Admin - All Requests</h3>
 
     <form method="get" class="mb-3">
         <label>Status</label>
@@ -100,10 +116,12 @@
         <thead>
             <tr>
                 <th>Employee</th>
+                <th>Employee ID</th>
                 <th>Start</th>
                 <th>End</th>
                 <th>Status</th>
                 <th>Reason</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -111,10 +129,15 @@
             {
                 <tr>
                     <td>@item.Employee.FirstName</td>
-                    <td>@item.StartDate.ToShortDateString()</td>
-                    <td>@item.EndDate.ToShortDateString()</td>
+                    <td>@item.Employee.EmployeeId</td>
+                    <td>@item.StartDate.ToString()</td>
+                    <td>@item.EndDate.ToString()</td>
                     <td>@item.Status</td>
                     <td>@item.Reason</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                           class="btn btn-sm btn-info">Details</a>
+                    </td>
                 </tr>
             }
         </tbody>
