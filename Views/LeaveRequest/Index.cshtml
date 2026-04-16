@@ -43,7 +43,7 @@
                 <td>@item.Status</td>
                 <td>@item.Reason</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                    <a asp-action="Details" asp-route-requestId="@item.RequestId"
                        class="btn btn-sm btn-info">Details</a>
                     <a asp-action="Edit" asp-route-requestId="@item.RequestId" 
                         class="btn btn-sm btn-info">Edit</a>
@@ -82,7 +82,7 @@
                     <td>@item.Status</td>
                     <td>@item.Reason</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                        <a asp-action="Details" asp-route-requestId="@item.RequestId
                            class="btn btn-sm btn-info">Details</a>
                         <a asp-action="Review" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-success">Review</a>
@@ -135,7 +135,7 @@
                     <td>@item.Status</td>
                     <td>@item.Reason</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Employee.EmployeeId"
+                        <a asp-action="Details" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-info">Details</a> |
                         <a asp-action="Review" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-success">Review</a>

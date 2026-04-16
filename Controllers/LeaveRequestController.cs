@@ -234,7 +234,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
             existingRequest.StartDate = formRequest.StartDate;
             existingRequest.EndDate = formRequest.EndDate;
             existingRequest.Reason = formRequest.Reason;
-            existingRequest.LeaveType = formRequest.LeaveType;
+            existingRequest.LeaveTypeId = formRequest.LeaveTypeId;
 
             await _context.SaveChangesAsync();
 
@@ -277,6 +277,11 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 TempData["Error"] = "Only pending requests can be approved.";
                 return RedirectToAction(nameof(Index));
             }
+            if(request.EmployeeId == int.Parse(User.FindFirstValue("EmployeeId")))
+            {
+                TempData["Error"] = "Managers cannot approve their own requests.";
+                return RedirectToAction(nameof(Index));
+            }
 
             request.Status = LeaveRequestStatus.APPROVED;
             await _context.SaveChangesAsync();
@@ -302,6 +307,12 @@ namespace YogaStudioLRAManagementSystem.Controllers
             if (request.Status != LeaveRequestStatus.PENDING)
             {
                 TempData["Error"] = "Only pending requests can be denied.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (request.EmployeeId == int.Parse(User.FindFirstValue("EmployeeId")))
+            {
+                TempData["Error"] = "Managers cannot deny their own requests.";
                 return RedirectToAction(nameof(Index));
             }
 
