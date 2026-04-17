@@ -5,7 +5,7 @@
     ViewData["Title"] = "Approve/Deny";
 }
 
-<h1>Approve / Deny Leave Request</h1>
+<h2>Review Leave Request</h2>
 
 <hr />
 @if (TempData["Error"] != null)
@@ -21,8 +21,8 @@
         @TempData["Success"]
     </div>
 }
-<div class="card-body">
-    <div>
+<div class="card shadow-sm">
+    <div class="card-body">
         <dl class="row">
 
             <dt class="col-sm-2">Request ID</dt>
@@ -69,9 +69,8 @@
 }
 else
 {
-    <p class="alert-info"><strong>This request has already been processed.</strong></p>
+    <p class="alert-info mt-3"><strong>This request has already been processed.</strong></p>
 }
 
-<hr />
 
 <a asp-action="Index" class="btn btn-primary">Back to List</a>

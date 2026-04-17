@@ -1,17 +1,18 @@
-﻿@model YogaStudioLRAManagementSystem.Models.LeaveRequest
+﻿@using YogaStudioLRAManagementSystem.Constants
+@using System.Security.Claims
+@model YogaStudioLRAManagementSystem.Models.LeaveRequest
 
 @{
     ViewData["Title"] = "Details";
-    var status = Model.Status.ToString();
+    var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
 }
 
-<h1>Details</h1>
+<h1>Leave Request Details</h1>
 
 <div>
-    <h4>LeaveRequest</h4>
-    <hr />
-    <div class="card-body">
-        <div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Employee</dt>
                 <dd class="col-sm-8">@Model.Employee.FirstName, @Model.Employee.LastName</dd>
@@ -37,13 +38,15 @@
 <div class="mt-3">
     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
     {
-    <a asp-action="Review" asp-route-requestId="@Model?.RequestId" class="btn btn-success">Review |</a> 
-        
+        @if(employeeId != Model?.EmployeeId)
+        {
+            <a asp-action="Review" asp-route-requestId="@Model?.RequestId" class="btn btn-success">Review</a>
+        }        
     }
-    @if( status == "PENDING")
+    @if(@Model?.Status == LeaveRequestStatus.PENDING)
     {
-        <a asp-action="Edit" asp-route-requestId="@Model?.RequestId" class="btn btn-warning">Edit |</a>
+        <a asp-action="Edit" asp-route-requestId="@Model?.RequestId" class="btn btn-warning">Edit</a>
+        <a asp-action="Delete" asp-route-requestId="@Model?.RequestId" class="btn btn-danger">Delete</a>
     }
-    <a asp-action="Edit" asp-route-requestId="@Model?.RequestId" class="btn btn-warning">Edit |</a>
     <a asp-action="Index" class="btn btn-primary">Back to List</a>
 </div>

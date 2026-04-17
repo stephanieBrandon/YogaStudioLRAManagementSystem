@@ -22,7 +22,7 @@
 }
 
 
-<h3>My Requests</h3>
+<h4>My Requests</h4>
 
 <table class="table table-striped">
     <thead>
@@ -45,8 +45,12 @@
                 <td>
                     <a asp-action="Details" asp-route-requestId="@item.RequestId"
                        class="btn btn-sm btn-info">Details</a>
-                    <a asp-action="Edit" asp-route-requestId="@item.RequestId" 
-                        class="btn btn-sm btn-info">Edit</a>
+
+                    @if(item.Status == LeaveRequestStatus.PENDING)
+                    {
+                        <a asp-action="Edit" asp-route-requestId="@item.RequestId"
+                           class="btn btn-sm btn-warning">Edit</a>
+                    }
                 </td>
             </tr>
         }
@@ -57,7 +61,7 @@
 
 @if (User.IsInRole("Manager"))
 {
-    <h3>Team Requests</h3>
+    <h4>Team Requests</h4>
 
     <table class="table">
         <thead>
@@ -82,7 +86,7 @@
                     <td>@item.Status</td>
                     <td>@item.Reason</td>
                     <td>
-                        <a asp-action="Details" asp-route-requestId="@item.RequestId
+                        <a asp-action="Details" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-info">Details</a>
                         <a asp-action="Review" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-success">Review</a>
@@ -95,7 +99,7 @@
 
 @if (User.IsInRole("Admin"))
 {
-    <h3>Admin - All Requests</h3>
+    <h4>Admin - All Requests</h4>
 
     <form method="get" class="mb-3">
         <label>Status</label>
@@ -136,7 +140,7 @@
                     <td>@item.Reason</td>
                     <td>
                         <a asp-action="Details" asp-route-requestId="@item.RequestId"
-                           class="btn btn-sm btn-info">Details</a> |
+                           class="btn btn-sm btn-info">Details</a> 
                         <a asp-action="Review" asp-route-requestId="@item.RequestId"
                            class="btn btn-sm btn-success">Review</a>
                     </td>

@@ -23,16 +23,15 @@ namespace YogaStudioLRAManagementSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string? statusFilter, int? employeeIdFilter)
         {
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
-            var role = User.FindFirstValue("Role");
-            //var user = await _context.Users
-            //    .FirstOrDefaultAsync(u => u.UserId == userId);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            //if (user == null)
-            //    return Unauthorized();
-            //var role = user.Role;
-            //var employeeId = user.EmployeeId;
+            if (user == null)
+                return Unauthorized();
+            var role = user.Role;
+            var employeeId = user.EmployeeId;
 
             var myRequests = await _context.LeaveRequests
                 .Include(l => l.Employee)
@@ -78,7 +77,6 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 MyRequests = myRequests,
                 TeamRequests = teamRequests,
                 AllRequests = allRequests,
-                //Role = role
             };
 
             return View(model);
@@ -124,16 +122,15 @@ namespace YogaStudioLRAManagementSystem.Controllers
             ModelState.Remove("Employee");
             ModelState.Remove("LeaveType");
 
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            //var user = await _context.Users
-            //    .FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            //if (user == null)
-            //    return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
-            leaveRequest.EmployeeId = employeeId; //user.EmployeeId;
+            leaveRequest.EmployeeId = user.EmployeeId;
             leaveRequest.Status = LeaveRequestStatus.PENDING;
 
             if (ModelState.IsValid)
@@ -159,20 +156,19 @@ namespace YogaStudioLRAManagementSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Staff, Admin")]
+        [Authorize(Roles = "Staff, Manager")]
         public async Task<IActionResult> Edit(int? requestId)
         {
             if (requestId == null)
                 return NotFound();
 
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            //var user = await _context.Users
-            //    .FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            //if (user == null)
-            //    return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
             var leaveRequest = await _context.LeaveRequests
                 .Include(l => l.LeaveType)
@@ -182,9 +178,11 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 return NotFound();
 
             //Ownership check:
-            if (leaveRequest.EmployeeId != employeeId)//user.EmployeeId)
+            if (leaveRequest.EmployeeId != user.EmployeeId)
+            {
+                TempData["Error"] = "You cannot edit a leave request on the behalf of another employee.";
                 return Forbid();
-
+            }
             //Only pending edit-able:
             if (leaveRequest.Status != LeaveRequestStatus.PENDING)
             {
@@ -201,14 +199,13 @@ namespace YogaStudioLRAManagementSystem.Controllers
         [Authorize(Roles = "Staff, Manager")]
         public async Task<IActionResult> Edit(int requestId, LeaveRequest formRequest)
         {
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            //var user = await _context.Users
-            //    .FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            //if (user == null)
-            //    return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
             var existingRequest = await _context.LeaveRequests
                 .FirstOrDefaultAsync(l => l.RequestId == requestId);
@@ -217,7 +214,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 return NotFound();
 
             //Ownership check:
-            if (existingRequest.EmployeeId != employeeId) //user.EmployeeId)
+            if (existingRequest.EmployeeId != user.EmployeeId)
             {
                 TempData["Error"] = "You cannot edit a leave request on the behalf of another employee.";
                 return Forbid();
@@ -348,14 +345,13 @@ namespace YogaStudioLRAManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int requestId)
         {
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var employeeId = int.Parse(User.FindFirstValue("EmployeeId"));
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            //var user = await _context.Users
-            //    .FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            //if (user == null)
-            //    return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
             var leaveRequest = await _context.LeaveRequests
                 .FirstOrDefaultAsync(l => l.RequestId == requestId);
@@ -367,7 +363,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
             }
                 
 
-            if (leaveRequest.EmployeeId != employeeId)//user.EmployeeId)
+            if (leaveRequest.EmployeeId != user.EmployeeId)
             {
                 TempData["Error"] = "You cannot delete a leave request on the behalf of another employee.";
                 return Forbid();
@@ -385,11 +381,6 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
             TempData["Error"] = "We could not delete your leave request.";
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool LeaveRequestExists(int id)
-        {
-            return _context.LeaveRequests.Any(e => e.RequestId == id);
         }
     }
 }

@@ -35,22 +35,14 @@
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <!-- Employee (display only) -->
-            <div class="mb-2">
-                <label class="form-label">Employee</label>
-                <p class="form-control-lg ">
-                    @User.Identity?.Name
-                </p>
-            </div>
-
             <div class="mb-3">
-                <label asp-for="StartDate" class="form-label"></label>
+                <label asp-for="StartDate" class="form-label">Start Date</label>
                 <input asp-for="StartDate" class="form-control" type="date" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="EndDate" class="form-label"></label>
+                <label asp-for="EndDate" class="form-label">End Date</label>
                 <input asp-for="EndDate" class="form-control" type="date" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
@@ -62,7 +54,7 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="LeaveTypeId" class="form-label"></label>
+                <label asp-for="LeaveTypeId" class="form-label">Leave Type</label>
                 <select asp-for="LeaveTypeId"
                         class="form-select"
                         asp-items="ViewBag.LeaveTypeId">
