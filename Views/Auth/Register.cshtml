@@ -45,7 +45,7 @@
                         <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Retype password">
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
-                    <span> Need to add an employee first?</span>
+                        <span class="text-muted small"> Need to add an employee first?</span>
                         <a asp-action="Create" asp-controller="Employee" class="text-center btn btn-outline-info btn-sm" >Add Employee</a> 
                     <div class="mb-3">
                         <label asp-for="EmployeeId" class="form-label">Employee</label>

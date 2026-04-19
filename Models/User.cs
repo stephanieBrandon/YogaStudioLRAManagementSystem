@@ -46,6 +46,9 @@ namespace YogaStudioLRAManagementSystem.Models
         [ForeignKey("EmployeeId")]
         public Employee Employee { get; set; } = null!; //null-forgiving operator - right now this is empty but it will not be empty when it matters
 
+        [Column("IS_ACTIVE")]
+        public bool IsActive { get; set; } = true; //default true, soft delete sets to false
+
         /// <summary>
         /// Hashes password enterd by the user on registration
         /// and set it to PasswordHash - then hashed password

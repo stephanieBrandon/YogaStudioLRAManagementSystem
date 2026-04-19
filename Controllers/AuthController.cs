@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using YogaStudioLRAManagementSystem.Constants;
 using YogaStudioLRAManagementSystem.Data;
 using YogaStudioLRAManagementSystem.Models;
@@ -15,10 +18,13 @@ namespace YogaStudioLRAManagementSystem.Controllers
     public class AuthController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+
         //dbcontext passed in from program.cs
-        public AuthController(ApplicationDbContext context)
+        public AuthController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -56,6 +62,13 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 //verify user exists and hash password match
                 if (dbUser != null && dbUser.VerifyPassword(loginUser.Password))
                 {
+                    //block deactivated users
+                    if (!dbUser.IsActive)
+                    {
+                        ModelState.AddModelError(string.Empty, "This account has been deactivated. Contact your administrator.");
+                        return View(loginUser);
+                    }
+
                     //build claims for cookie 
                     var claims = new List<Claim>
                     {
@@ -71,6 +84,22 @@ namespace YogaStudioLRAManagementSystem.Controllers
                     //sign in with presistent cookie based on RememberMe
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal,
                          new AuthenticationProperties { IsPersistent = loginUser.RememberMe });
+                    
+                    //generate JWT for AttendanceAPI calls
+                    var jwtKey = _configuration["Jwt:Key"]!; //read shared secret key from appsetting.json
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)); //convert key string to bytes
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); //sign with HMAC SHA256
+
+                    var jwtToken = new JwtSecurityToken(
+                        claims: claims, //same claims already built above
+                        expires: DateTime.Now.AddHours(8), //token expires in 8 hrs
+                        signingCredentials: creds
+                    );
+
+                    var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken); //serialize token to string
+
+                    //store in session so views can access it
+                    HttpContext.Session.SetString("jwt", tokenString);
                     
                     //Force password change on first login
                     if (dbUser.MustChangePassword)
@@ -236,7 +265,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
             }
             return View(model);
         }
-
+       
         /// <summary>
         /// POST: /Auth/Logout
         /// Signes out user and clear session cookie
