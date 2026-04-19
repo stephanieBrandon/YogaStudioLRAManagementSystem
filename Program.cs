@@ -20,6 +20,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 
+//session to store JWT token after login so views can access it for API calls
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);  //session expires after 8 hours of inactivity
+    options.Cookie.HttpOnly = true; //prevents JS from acceessing session cookie
+    options.Cookie.IsEssential = true; //required
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +44,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession(); //must be fore authetnication - loads session data into request
 app.UseAuthentication();
 app.UseAuthorization();
 
