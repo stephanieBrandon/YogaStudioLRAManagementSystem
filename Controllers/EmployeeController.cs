@@ -20,6 +20,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         // GET: Employee
         // INDEX - Displays a list of all employees
         // Eager loads StudioRole so we can show the role name in the table
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index()
         {
             var employees = await _context.Employees
@@ -31,6 +32,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         // GET: Employee/Details/5
         // DETAILS - Displays a single employee's full info
         // Returns 404 if the id is null or employee doesn't exist
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -89,7 +91,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         // GET: Employee/Edit/5
         // EDIT (GET) - Loads the form pre-filled with existing employee data
         // Passes the current StudioRoleId to pre-select the dropdown
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -108,7 +110,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         // Handles concurrency in case the record was deleted mid-edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.EmployeeId) return NotFound();

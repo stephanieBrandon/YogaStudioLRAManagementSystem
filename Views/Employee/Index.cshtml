@@ -46,10 +46,13 @@ else
                         <a asp-action="Details" asp-route-id="@emp.EmployeeId"
                            class="btn btn-sm btn-info">Details</a>
 
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <a asp-action="Edit" asp-route-id="@emp.EmployeeId"
                                class="btn btn-sm btn-warning">Edit</a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
                             <a asp-action="Delete" asp-route-id="@emp.EmployeeId"
                                class="btn btn-sm btn-danger">Delete</a>
                         }
