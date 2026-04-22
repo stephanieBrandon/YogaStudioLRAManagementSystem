@@ -35,7 +35,7 @@ namespace YogaStudioLRAManagementSystem.Data
                     EmployeeId = 999,
                     FirstName = "Studio",
                     LastName = "Owner",
-                    HireDate = new DateTime(2024, 1, 1),
+                    HireDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     VacationBalance = 0,
                     SickLeaveBalance = 0,
                     StudioRoleId = 1 // Instructor

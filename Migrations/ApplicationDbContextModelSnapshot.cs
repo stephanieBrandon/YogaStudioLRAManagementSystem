@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Oracle.EntityFrameworkCore.Metadata;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using YogaStudioLRAManagementSystem.Data;
 
 #nullable disable
@@ -18,43 +18,43 @@ namespace YogaStudioLRAManagementSystem.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.23")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("YogaStudioLRAManagementSystem.Models.Attendance", b =>
                 {
                     b.Property<int>("AttendanceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("ATTENDANCE_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttendanceId"));
 
                     b.Property<DateTime?>("ClockIn")
-                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("CLOCK_IN");
 
                     b.Property<DateTime?>("ClockOut")
-                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("CLOCK_OUT");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("TIMESTAMP(7)")
-                        .HasColumnName("DATE");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ATTENDANCE_DATE");
 
                     b.Property<int>("EmployeeId")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("EMPLOYEE_ID");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("NVARCHAR2(10)")
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("STATUS");
 
                     b.Property<double?>("TotalHours")
-                        .HasColumnType("BINARY_DOUBLE")
+                        .HasColumnType("double precision")
                         .HasColumnName("TOTAL_HOURS");
 
                     b.HasKey("AttendanceId");
@@ -68,42 +68,42 @@ namespace YogaStudioLRAManagementSystem.Migrations
                 {
                     b.Property<int>("EmployeeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("EMPLOYEE_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EmployeeId"));
 
                     b.Property<string>("Certification")
                         .HasMaxLength(150)
-                        .HasColumnType("NVARCHAR2(150)")
+                        .HasColumnType("character varying(150)")
                         .HasColumnName("CERTIFICATION");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("NVARCHAR2(30)")
+                        .HasColumnType("character varying(30)")
                         .HasColumnName("FIRST_NAME");
 
                     b.Property<DateTime>("HireDate")
-                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("HIRE_DATE");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("NVARCHAR2(30)")
+                        .HasColumnType("character varying(30)")
                         .HasColumnName("LAST_NAME");
 
                     b.Property<int>("SickLeaveBalance")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("SICK_LEAVE_BALANCE");
 
                     b.Property<int>("StudioRoleId")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("STUDIO_ROLE_ID");
 
                     b.Property<int>("VacationBalance")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("VACATION_BALANCE");
 
                     b.HasKey("EmployeeId");
@@ -117,7 +117,7 @@ namespace YogaStudioLRAManagementSystem.Migrations
                         {
                             EmployeeId = 999,
                             FirstName = "Studio",
-                            HireDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HireDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             LastName = "Owner",
                             SickLeaveBalance = 0,
                             StudioRoleId = 1,
@@ -129,36 +129,36 @@ namespace YogaStudioLRAManagementSystem.Migrations
                 {
                     b.Property<int>("RequestId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("REQUEST_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RequestId"));
 
                     b.Property<int>("EmployeeId")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("EMPLOYEE_ID");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("END_DATE");
 
                     b.Property<int>("LeaveTypeId")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("LEAVE_TYPE_ID");
 
                     b.Property<string>("Reason")
                         .HasMaxLength(150)
-                        .HasColumnType("NVARCHAR2(150)")
+                        .HasColumnType("character varying(150)")
                         .HasColumnName("REASON");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("START_DATE");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("NVARCHAR2(10)")
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("REQUEST_STATUS");
 
                     b.HasKey("RequestId");
@@ -174,31 +174,31 @@ namespace YogaStudioLRAManagementSystem.Migrations
                 {
                     b.Property<int>("LeaveTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("LEAVE_TYPE_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveTypeId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LeaveTypeId"));
 
                     b.Property<bool>("AffectsBalance")
-                        .HasColumnType("NUMBER(1)")
+                        .HasColumnType("boolean")
                         .HasColumnName("AFFECTS_BALANCE");
 
                     b.Property<bool>("IsPaid")
-                        .HasColumnType("NUMBER(1)")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_PAID");
 
                     b.Property<int>("MaxDays")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("MAX_DAYS");
 
                     b.Property<int>("MinDays")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("MIN_DAYS");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("NVARCHAR2(50)")
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("LEAVE_NAME");
 
                     b.HasKey("LeaveTypeId");
@@ -266,19 +266,19 @@ namespace YogaStudioLRAManagementSystem.Migrations
                 {
                     b.Property<int>("StudioRoleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("STUDIO_ROLE_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudioRoleId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudioRoleId"));
 
                     b.Property<bool>("RequiresCertification")
-                        .HasColumnType("NUMBER(1)")
+                        .HasColumnType("boolean")
                         .HasColumnName("REQUIRES_CERT");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("NVARCHAR2(15)")
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("ROLE_NAME");
 
                     b.HasKey("StudioRoleId");
@@ -310,45 +310,45 @@ namespace YogaStudioLRAManagementSystem.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("USER_ID");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("EMAIL_ID");
 
                     b.Property<int>("EmployeeId")
-                        .HasColumnType("NUMBER(10)")
+                        .HasColumnType("integer")
                         .HasColumnName("EMPLOYEE_ID");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("NUMBER(1)")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_ACTIVE");
 
                     b.Property<bool>("MustChangePassword")
-                        .HasColumnType("NUMBER(1)")
+                        .HasColumnType("boolean")
                         .HasColumnName("MUST_CHANGE_PASSWORD");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("HASH_PASSWORD");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("NVARCHAR2(10)")
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("PROFILE_ROLE");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("NVARCHAR2(50)")
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("USER_NAME");
 
                     b.HasKey("UserId");
@@ -365,7 +365,7 @@ namespace YogaStudioLRAManagementSystem.Migrations
                             EmployeeId = 999,
                             IsActive = true,
                             MustChangePassword = false,
-                            Password = "AQAAAAIAAYagAAAAECnwM22fuVdUcdvOZk2zvO9t7ZQWp9+gnE4Q273VegdJuycMa9iWiphf6TyePThp0w==",
+                            Password = "AQAAAAIAAYagAAAAEOCJGv2O55/MXqWHaloEU4JuFZUKXj7p5WTurrv4qfw5gEZ2wE1w8NUKQBCDwdB6tA==",
                             Role = "Admin",
                             UserName = "admin"
                         });

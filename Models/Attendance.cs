@@ -20,7 +20,7 @@ namespace YogaStudioLRAManagementSystem.Models
         public Employee Employee { get; set; } = null!; //null-forgiving operator - right now this is empty but it will not be empty when it matters
 
         [Required]
-        [Column("DATE")]
+        [Column("ATTENDANCE_DATE")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] //display as 2026-03-28
         public DateTime Date {  get; set; }
