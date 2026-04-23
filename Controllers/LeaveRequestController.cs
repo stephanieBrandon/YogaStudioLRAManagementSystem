@@ -8,6 +8,7 @@ using YogaStudioLRAManagementSystem.Models;
 using YogaStudioLRAManagementSystem.Constants;
 using YogaStudioLRAManagementSystem.ViewModels;
 using System.Linq.Expressions;
+using YogaStudioLRAManagementSystem.Helpers;
 
 namespace YogaStudioLRAManagementSystem.Controllers
 {
@@ -501,7 +502,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         //------------------------------------------------------------------------------------------------------
         private void ValidateDates(LeaveRequest request, LeaveType? leaveType)
         {
-            var today = DateTime.Today;
+            var today = DateHelper.Today;
 
             if (request.StartDate <= today)
                 ModelState.AddModelError("StartDate", "Start date must be after today.");

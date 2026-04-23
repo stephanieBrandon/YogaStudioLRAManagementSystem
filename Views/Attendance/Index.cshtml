@@ -1,4 +1,5 @@
-﻿@model YogaStudioLRAManagementSystem.ViewModels.AttendanceViewModel
+﻿@using YogaStudioLRAManagementSystem.Helpers
+@model YogaStudioLRAManagementSystem.ViewModels.AttendanceViewModel
 @using YogaStudioLRAManagementSystem.Constants
 
 @{
@@ -145,8 +146,8 @@
                                 <td>@record.Employee.FirstName @record.Employee.LastName</td>
                             }
                             <td>@record.Date.ToString("yyyy-MM-dd")</td>
-                            <td>@(record.ClockIn?.ToString("hh:mm tt") ?? "--")</td>
-                            <td>@(record.ClockOut?.ToString("hh:mm tt") ?? "--")</td>
+                            <td>@(record.ClockIn?.ToEastern().ToString("hh:mm tt") ?? "--")</td>
+                            <td>@(record.ClockOut?.ToEastern().ToString("hh:mm tt") ?? "--")</td>
                             <td>@(record.TotalHours?.ToString("F2") ?? "--")</td>
                             <td>
                                 @{

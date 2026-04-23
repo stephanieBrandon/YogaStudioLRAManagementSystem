@@ -6,6 +6,7 @@ using YogaStudioLRAManagementSystem.Constants;
 using YogaStudioLRAManagementSystem.Data;
 using YogaStudioLRAManagementSystem.Models;
 using YogaStudioLRAManagementSystem.ViewModels;
+using YogaStudioLRAManagementSystem.Helpers;
 
 namespace YogaStudioLRAManagementSystem.Controllers
 {
@@ -35,7 +36,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
             //get today's attendance record if it exists and null if employee hasn't visited page yet
             var todayRecord = await _context.Attendances
-                .FirstOrDefaultAsync(a => a.EmployeeId == employeeId && a.Date == DateTime.Today);
+                .FirstOrDefaultAsync(a => a.EmployeeId == employeeId && a.Date == DateHelper.Today);
 
             // pass JWT to view for fetch calls to AttendanceAPI
             ViewBag.JwtToken = HttpContext.Session.GetString("jwt");
@@ -60,8 +61,8 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 if (staffEmployeeId == null)
                     return RedirectToAction("Login", "Auth");
 
-                viewModel.SelectedMonth = month ?? DateTime.Today.Month;
-                viewModel.SelectedYear = year ?? DateTime.Today.Year;
+                viewModel.SelectedMonth = month ?? DateHelper.Today.Month;
+                viewModel.SelectedYear = year ?? DateHelper.Today.Year;
 
                 viewModel.Records = await _context.Attendances
                     .Where(a =>
@@ -84,20 +85,20 @@ namespace YogaStudioLRAManagementSystem.Controllers
                 {
                     var exists = await _context.Attendances.AnyAsync(a =>
                         a.EmployeeId == employee.EmployeeId &&
-                        a.Date == DateTime.Today);
+                        a.Date == DateHelper.Today);
 
                     if (exists) continue;
 
                     var isOnLeave = await _context.LeaveRequests.AnyAsync(lr =>
                         lr.EmployeeId == employee.EmployeeId &&
                         lr.Status == LeaveRequestStatus.APPROVED &&
-                        lr.StartDate <= DateTime.Today &&
-                        lr.EndDate >= DateTime.Today);
+                        lr.StartDate <= DateHelper.Today &&
+                        lr.EndDate >= DateHelper.Today);
 
                     _context.Attendances.Add(new Attendance
                     {
                         EmployeeId = employee.EmployeeId,
-                        Date = DateTime.Today,
+                        Date = DateHelper.Today,
                         Status = isOnLeave ? AttendanceStatus.ON_LEAVE : AttendanceStatus.ABSENT
                     });
                 }
