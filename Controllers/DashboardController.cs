@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using YogaStudioLRAManagementSystem.Constants;
 using YogaStudioLRAManagementSystem.Data;
 using YogaStudioLRAManagementSystem.ViewModels;
+using YogaStudioLRAManagementSystem.Helpers;
 
 namespace YogaStudioLRAManagementSystem.Controllers
 {
@@ -29,7 +30,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var viewModel = new DashboardViewModel();
-            var today = DateTime.Today;
+            var today = DateHelper.Today;
 
             //STAFF
             if (User.IsInRole(UserRoles.STAFF))

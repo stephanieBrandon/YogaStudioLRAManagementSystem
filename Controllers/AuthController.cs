@@ -92,7 +92,7 @@ namespace YogaStudioLRAManagementSystem.Controllers
 
                     var jwtToken = new JwtSecurityToken(
                         claims: claims, //same claims already built above
-                        expires: DateTime.Now.AddHours(8), //token expires in 8 hrs
+                        expires: DateTime.UtcNow.AddHours(8), //token expires in 8 hrs
                         signingCredentials: creds
                     );
 
